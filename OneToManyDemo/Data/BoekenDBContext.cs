@@ -19,10 +19,22 @@ namespace OneToManyDemo.Data
 
 			//configure Auteur entity(table) - FLUENT API
 			modelBuilder.Entity<Auteur>()
-					.HasMany(a => a.Boeken)
-					.WithOne(b => b.Auteur)
-					.HasForeignKey(b => b.AuteurId)
-					.OnDelete(DeleteBehavior.NoAction);
+				.HasKey(a => a.AuteurId);
+			modelBuilder.Entity<Auteur>()
+				.HasMany(a => a.Boeken)
+				.WithOne(b => b.Auteur)
+				.HasForeignKey(b => b.AuteurId)
+				.OnDelete(DeleteBehavior.NoAction);
+
+			//configure Boek entity
+			modelBuilder.Entity<Boek>()
+				.HasKey(b => b.BoekId);
+			modelBuilder.Entity<Boek>()
+				.HasOne(b => b.Auteur)
+				.WithMany(a => a.Boeken)
+				.HasForeignKey(b => b.AuteurId)
+				.OnDelete(DeleteBehavior.NoAction);
+
 
 			SeedData.AddRecords(modelBuilder);
 		}
