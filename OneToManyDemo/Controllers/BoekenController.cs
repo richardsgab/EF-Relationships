@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OneToManyDemo.Data;
+using OneToManyDemo.Models;
 using OneToManyDemo.Models.ViewModels;
 
 namespace OneToManyDemo.Controllers
@@ -23,6 +24,56 @@ namespace OneToManyDemo.Controllers
 					AuteurNaam = b.Auteur.Naam,
 				});
 			return View(boekAuteurViewModel);
+		}
+
+		public async Task<IActionResult> Filters(int? GeselecteerdeAuteurId)
+		{
+			var auteurs = await _context.Auteurs.ToListAsync();
+
+			IQueryable<Boek> boekenQuery = _context.Boeks.Include(b => b.Auteur);
+
+			if (GeselecteerdeAuteurId.HasValue)
+			{
+				boekenQuery = boekenQuery.Where(b => b.AuteurId == GeselecteerdeAuteurId);
+			}
+
+			var boeken = await boekenQuery.ToListAsync();
+
+			var boekenViewModel = boeken.Select(b => new BoekAuteurViewModel
+			{
+				BoekId = b.BoekId,
+				Titel = b.Titel,
+				AuteurNaam = b.Auteur.Naam
+			}).ToList();
+
+			var filtersViewModel = new BoekenViewModel
+			{
+				Auteurs = auteurs,
+				Boeken = boekenViewModel,
+				GeselecteerdeAuteurId = GeselecteerdeAuteurId ?? 0
+			};
+			return View(filtersViewModel);
+		}
+
+		public async Task<IActionResult> Filter1(int? GeselecteerdeAuteurId)
+		{
+			var auteurs = await _context.Auteurs.ToListAsync();
+			IQueryable<Boek> boekenQuery = _context.Boeks.Include(b => b.Auteur);
+
+			if(GeselecteerdeAuteurId.HasValue && GeselecteerdeAuteurId > 0)
+			{
+				boekenQuery = boekenQuery.Where(b => b.AuteurId == GeselecteerdeAuteurId.Value);	
+			}
+
+			var boeken = await boekenQuery.ToListAsync();
+			var viewModel = new BoekenVM1
+			{
+				Auteurs = auteurs,
+				Boeken = boeken,
+				GeselecteerdeAuteurId = GeselecteerdeAuteurId ?? 0
+			};
+
+			return View(viewModel);
 		}
 	}
 }
