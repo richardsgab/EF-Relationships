@@ -75,5 +75,49 @@ namespace OneToManyDemo.Controllers
 
 			return View(viewModel);
 		}
+
+		public async Task<IActionResult> Create()
+		{
+			//buscar el autor en la lista del dropdown gracias al ViewModel CreateBoekVM
+			var auteurs = await _context.Auteurs.ToListAsync();
+			var viewmodel = new CreateBoekViewModel
+			{
+				Auteurs = auteurs
+			};
+			return View(viewmodel);
+		}
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Create(CreateBoekViewModel viewmodel)
+		{
+			if (!ModelState.IsValid) 
+			{
+				viewmodel.Auteurs = await _context.Auteurs.ToListAsync();
+				return View(viewmodel);
+			}
+			var newBoek = new Boek
+			{
+				Titel = viewmodel.Titel,
+				AuteurId = viewmodel.AuteurId,
+			};
+			_context.Boeks.Add(newBoek);
+			await _context.SaveChangesAsync();
+			return RedirectToAction(nameof(Filters));
+		}
+		public async Task<IActionResult> Details(int? id)
+		{
+			if(id == null)
+			{
+				return NotFound();
+			}
+			var boek = await _context.Boeks
+				.Include(b => b.Auteur)
+				.FirstOrDefaultAsync(b => b.BoekId == id);
+			if (boek == null)
+			{
+				return NotFound();
+			}
+			return View(boek);
+		}
 	}
 }

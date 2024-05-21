@@ -1,17 +1,22 @@
 ﻿@model OneToManyDemo.Models.ViewModels.BoekenViewModel
 
+<p>
+    <a asp-action="Create" class="btn btn-outline-info">Nieuw Boek Toevoegen</a>
+</p>
+
 <form asp-action="Filters" asp-controller="Boeken" method="get">
     <select asp-for="GeselecteerdeAuteurId" asp-items="@(new SelectList(Model.Auteurs,"AuteurId","Naam" ))" class="form-control">
         <option value="">Selecteer een Auteur</option>
     </select>
-    <button type="submit" class="btn btn-primary">Filter</button>
+    <button type="submit" class="btn btn-outline-info my-2">Filter</button>
 </form>
 
-<table class="table table-striped">
+<table class="table table-secondary">
     <thead>
-        <tr>
+        <tr class="table-dark">
             <th>Titel</th>
             <th>Auteur</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -20,7 +25,18 @@
             <tr>
                 <td>@boek.Titel</td>
                 <td>@boek.AuteurNaam</td>
+                <td class="fw-bold">
+                @Html.ActionLink("Edit", "Edit", new { id = boek.BoekId })
+                @Html.ActionLink("Details", "Details", new {id=boek.BoekId})    
+                @Html.ActionLink("Delete", "Delete", new {id=boek.BoekId})</td>    
             </tr>
         }
     </tbody>
+    <tfoot>
+        <tr>
+            <td>
+                <i class="fw-bold">Aantal boeken in collectie: @Model.Boeken.Count</i>
+            </td>
+        </tr>
+    </tfoot>
 </table>
